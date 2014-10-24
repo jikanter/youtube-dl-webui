@@ -10,8 +10,10 @@ http.createServer(function(request, response) {
   var video = url.parse(request.url, true).query;
   if (video.url) { 
     console.log(video.url);
-    var ytDownloader = spawn('/usr/local/bin/youtube-dl', ['-o', '/usr/local/var/videos/youtube.flv','-f', 'flv', video.url]);
-  
+    var ytDownloader = spawn('/usr/local/bin/youtube-dl', ['-o', '/usr/local/var/videos/%(id)s.flv',
+    '--exec', 'mv {} /usr/local/var/videos/youtube.flv',
+    '-f', 'flv', video.url]);
+    
     ytDownloader.on('close', function(code, signal) {
       response.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'});
       response.write('<!DOCTYPE HTML>');
