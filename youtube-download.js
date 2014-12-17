@@ -40,7 +40,7 @@ http.createServer(function(request, response) {
       response.write('</section>');
       response.write('</div>');
       response.write('</form>');
-      response.write("<a href='http://localhost:9001/youtube.flv'>Download Video</a>");
+      response.write("<a href='youtube.flv'>Download Video</a> <p>Directions: Right-Click &quot;Download Video&quot;, Then click Save-As to save the video to your desktop</p>");
       response.write('</body>');
       response.write('</html>');
       response.end();
