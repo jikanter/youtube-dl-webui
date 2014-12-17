@@ -4,4 +4,4 @@ Web UI for (http://rg3.github.io/youtube-dl/)
 
 You will need express for serving static content.
 
-$ npm install express
+$ npm install
