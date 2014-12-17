@@ -1,0 +1,21 @@
+{
+  "name": "youtube-dl-webui",
+  "version": "0.0.1",
+  "description": "a Web UI for youtube-dl (http://rg3.github.io/youtube-dl/) ui",
+  "homepage": "https://github.com/jikanter/youtube-dl-webui",
+  "license": "Proprietary",
+  "author": {
+    "name": "Jordan Kanter",
+    "email": "jikanter@gmail.com"
+  },
+  "repository": { 
+    "type": "git",
+    "url": "https://github.com/jikanter/youtube-dl-webui",
+  },
+  "dependencies": {
+    "express": "~4.10.0"
+  },
+  "engines": {
+    "node": ">0.10.0"
+  }
+}
