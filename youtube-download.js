@@ -26,7 +26,9 @@ http.createServer(function(request, response) {
   if (video.url) { 
     console.log(video.url);
     var ytDownloader = spawn('/usr/local/bin/youtube-dl', ['-o', '/usr/local/var/videos/%(id)s.flv',
-    checkSslCertificateP ? "" : "--no-check-certificate" ,
+    // --no-progress is basically a no-op, because we need something else here for old
+    // versions of python because for some reason node barfs on an empty string in the arguments list
+    checkSslCertificateP ? "--no-progress" : "--no-check-certificate" ,
     '--exec', 'mv {} /usr/local/var/videos/youtube.flv',
     '-f', 'flv', video.url]);
     
