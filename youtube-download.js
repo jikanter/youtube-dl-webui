@@ -5,33 +5,47 @@ var parse = require('querystring').parse;
 var emitter = require('events').EventEmitter;
 var url = require('url');
 
-
-
-
 var config = {
   pythonVersion: [2,7,9],
-  staticHost: "localhost"
+  staticHost: "localhost",
+  // if you want to keep the extracted files on the server in temporary directory 
+  // in the format <artist>-<song>-<id>.<format>, change this to true
+  storeExtractedFile: true,
 }
-
-
 
 
 http.createServer(function(request, response) { 
   
   var video = url.parse(request.url, true).query;
-  pythonVersion = config['pythonVersion'];
-  staticHost = config['staticHost'];
+  var pythonVersion = config['pythonVersion'];
+  var staticHost = config['staticHost'];
+  // if we are storing extracted files, copy the resource, don't move it 
+  var resourceGenerationCommand = config['storeExtractedFile'] ? 'cp' : 'mv';
+
   //  see https://github.com/rg3/youtube-dl/issues/4896
   var checkSslCertificateP = ((pythonVersion[0] > 3) || ((pythonVersion[0] == 2) && (pythonVersion[2] < 9)));
   if (video.url) { 
+    var extractAudio = video['extract-audio'];
+    //if (extractAudio) { console.log("Extracting Audio"); }
     console.log(video.url);
-    var ytDownloader = spawn('/usr/local/bin/youtube-dl', ['-o', '/usr/local/var/videos/%(id)s.flv',
+
+    // if we are extracting audio, create the audio extraction parameter list
+    var audioParams = extractAudio ? ["--extract-audio", "--audio-format", "m4a"] : [];
+    var fileSuffix = extractAudio ? 'm4a' : 'mp4';
+    resourceGenerationCommand = resourceGenerationCommand + ' {} /usr/local/var/videos/youtube.' + fileSuffix;
+
+    console.log(resourceGenerationCommand);
+    // the downloader command
+
+    var ytDownloader = spawn('/usr/local/bin/youtube-dl', ['-o', '/usr/local/var/videos/%(title)s-%(id)s.' + fileSuffix,
     // --no-progress is basically a no-op, because we need something else here for old
     // versions of python because for some reason node barfs on an empty string in the arguments list
-    checkSslCertificateP ? "--no-progress" : "--no-check-certificate" ,
-    '--exec', 'mv {} /usr/local/var/videos/youtube.flv',
-    '-f', 'flv', video.url]);
-    
+    checkSslCertificateP ? "--no-progress" : "--no-check-certificate",
+    '--exec', resourceGenerationCommand,
+    //'--verbose',
+    // extractAudio flag
+    '-f', fileSuffix,
+    video.url].concat(audioParams));
     ytDownloader.on('close', function(code, signal) {
       response.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'});
       response.write('<!DOCTYPE HTML>');
@@ -54,11 +68,13 @@ http.createServer(function(request, response) {
       response.write('<input type="text" name="url" />');
       response.write('</section>');
       response.write('<section>');
+      response.write('<label for="extract-audio">Extract Audio?</label>');
+      response.write('<input type="checkbox" name="extract-audio" value="Extract Audio">');
       response.write('<input type="submit" value="Get Video"/>');
       response.write('</section>');
       response.write('</div>');
       response.write('</form>');
-      response.write("<a href='http://"+staticHost+":9001/youtube.flv'>Download Video</a> <p>Directions: Right-Click &quot;Download Video&quot;, Then click Save-As to save the video to your desktop</p>");
+      response.write("<a href='http://"+staticHost+":9001/youtube."+fileSuffix+"'>Download Video</a> <p>Directions: Right-Click &quot;Download Video&quot;, Then click Save-As to save the video to your desktop</p>");
       response.write('</body>');
       response.write('</html>');
       response.end();
@@ -85,11 +101,13 @@ http.createServer(function(request, response) {
       response.write('<input type="text" name="url" />');
       response.write('</section>');
       response.write('<section>');
+      response.write('<label for="extract-audio">Extract Audio?</label>');
+      response.write('<input type="checkbox" name="extract-audio" value="Extract Audio">');
       response.write('<input type="submit" value="Get Video"/>');
       response.write('</section>');
       response.write('</div>');
       response.write('</form>');
-      //response.write("<a href='http://localhost:9001/youtube.flv'>Download Video</a>");
+      //response.write("<a href='http://localhost:9001/youtube.mp4'>Download Video</a>");
       response.write('</body>')
       response.write('</html>');
       response.end();
