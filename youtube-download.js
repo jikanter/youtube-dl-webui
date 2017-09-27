@@ -32,12 +32,12 @@ http.createServer(function(request, response) {
     // if we are extracting audio, create the audio extraction parameter list
     var audioParams = extractAudio ? ["--extract-audio", "--audio-format", "m4a"] : [];
     var fileSuffix = extractAudio ? 'm4a' : 'mp4';
-    resourceGenerationCommand = resourceGenerationCommand + ' {} /usr/local/var/videos/youtube.' + fileSuffix;
+    resourceGenerationCommand = resourceGenerationCommand + ' {} /Volumes/FRANKLIN/Music/youtube.' + fileSuffix;
 
     console.log(resourceGenerationCommand);
     // the downloader command
 
-    var ytDownloader = spawn('/usr/local/bin/youtube-dl', ['-o', '/usr/local/var/videos/%(title)s-%(id)s.' + fileSuffix,
+    var ytDownloader = spawn('/usr/local/bin/youtube-dl', ['-o', '/Volumes/FRANKLIN/Music/%(title)s-%(id)s.' + fileSuffix,
     // --no-progress is basically a no-op, because we need something else here for old
     // versions of python because for some reason node barfs on an empty string in the arguments list
     checkSslCertificateP ? "--no-progress" : "--no-check-certificate",
