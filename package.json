@@ -13,9 +13,9 @@
     "url": "https://github.com/jikanter/youtube-dl-webui"
   },
   "dependencies": {
-    "express": "~4.10.0"
+    "express": "^4.19.2"
   },
   "engines": {
-    "node": ">0.10.0"
+    "node": ">21.7.3"
   }
 }
