@@ -6,25 +6,26 @@ var emitter = require('events').EventEmitter;
 var url = require('url');
 
 var config = {
-  pythonVersion: [2,7,9],
+  pythonVersion: [3,10,12],
   staticHost: "localhost",
-  // if you want to keep the extracted files on the server in temporary directory 
+  // if you want to keep the extracted files on the server in temporary directory
   // in the format <artist>-<song>-<id>.<format>, change this to true
+  contentRoot: '/media/admin/CRICK/Videos',
   storeExtractedFile: true,
 }
 
 
-http.createServer(function(request, response) { 
-  
+http.createServer(function(request, response) {
+
   var video = url.parse(request.url, true).query;
   var pythonVersion = config['pythonVersion'];
   var staticHost = config['staticHost'];
-  // if we are storing extracted files, copy the resource, don't move it 
+  // if we are storing extracted files, copy the resource, don't move it
   var resourceGenerationCommand = config['storeExtractedFile'] ? 'cp' : 'mv';
 
   //  see https://github.com/rg3/youtube-dl/issues/4896
   var checkSslCertificateP = ((pythonVersion[0] > 3) || ((pythonVersion[0] == 2) && (pythonVersion[2] < 9)));
-  if (video.url) { 
+  if (video.url) {
     var extractAudio = video['extract-audio'];
     //if (extractAudio) { console.log("Extracting Audio"); }
     console.log(video.url);
@@ -32,12 +33,12 @@ http.createServer(function(request, response) {
     // if we are extracting audio, create the audio extraction parameter list
     var audioParams = extractAudio ? ["--extract-audio", "--audio-format", "m4a"] : [];
     var fileSuffix = extractAudio ? 'm4a' : 'mp4';
-    resourceGenerationCommand = resourceGenerationCommand + ' {} /Volumes/FRANKLIN/Music/youtube.' + fileSuffix;
+    resourceGenerationCommand = resourceGenerationCommand + ' {} ' + config.contentRoot + '/youtube.' + fileSuffix;
 
     console.log(resourceGenerationCommand);
     // the downloader command
 
-    var ytDownloader = spawn('/usr/local/bin/youtube-dl', ['-o', '/Volumes/FRANKLIN/Music/%(title)s-%(id)s.' + fileSuffix,
+    var ytDownloader = spawn('/usr/bin//youtube-dl', ['-o', config.contentRoot + '/%(title)s-%(id)s.' + fileSuffix,
     // --no-progress is basically a no-op, because we need something else here for old
     // versions of python because for some reason node barfs on an empty string in the arguments list
     checkSslCertificateP ? "--no-progress" : "--no-check-certificate",
@@ -79,7 +80,7 @@ http.createServer(function(request, response) {
       response.write('</html>');
       response.end();
     });
-  } else { 
+  } else {
       response.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'});
       response.write('<!DOCTYPE HTML>');
       response.write('<html>');
@@ -112,5 +113,5 @@ http.createServer(function(request, response) {
       response.write('</html>');
       response.end();
     }
-  
+
 }).listen(8125);
